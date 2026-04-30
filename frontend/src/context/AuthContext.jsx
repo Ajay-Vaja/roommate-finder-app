@@ -7,30 +7,39 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Auto-login if token exists (hits the /me route)
   useEffect(() => {
-    // Check if user is logged in (e.g. from localStorage)
-    const token = localStorage.getItem('token');
-    if (token) {
-      // In a real app, verify token via API. For mock:
-      setUser({ token });
-    }
-    setLoading(false);
+    const fetchUser = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const { data } = await api.get('/auth/me');
+          setUser(data);
+        } catch (error) {
+          console.error("Token invalid or expired");
+          localStorage.removeItem('token');
+        }
+      }
+      setLoading(false);
+    };
+
+    fetchUser();
   }, []);
 
   const login = async (email, password) => {
-    // try {
-    //   const { data } = await api.post('/auth/login', { email, password });
-    //   localStorage.setItem('token', data.access_token);
-    //   setUser({ token: data.access_token });
-    // } catch(e) { throw e; }
+    // Send email/password to backend
+    const { data } = await api.post('/auth/login', { email, password });
     
-    // Mock login for scaffold
-    localStorage.setItem('token', 'mock_token');
-    setUser({ token: 'mock_token' });
+    // Save the token to localStorage
+    localStorage.setItem('token', data.access_token);
+    
+    // Save user data to React state
+    setUser(data.user);
   };
 
   const register = async (userData) => {
-    // await api.post('/auth/register', userData);
+    // Send all form data to backend
+    await api.post('/auth/register', userData);
   };
 
   const logout = () => {

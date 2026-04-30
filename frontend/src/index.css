@@ -1,20 +1,18 @@
-/* 
- * CSS reset and basic styling for the Roommate Finder App
- * Uses a modern theme suitable for a production app
- */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --primary-color: #6366f1; /* Indigo */
-  --primary-hover: #4f46e5;
-  --secondary-color: #f3f4f6;
+  --primary: #8b5cf6;
+  --primary-hover: #7c3aed;
+  --secondary: #ec4899;
+  --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+  --card-bg: rgba(255, 255, 255, 0.85); /* Made slightly more transparent to see blobs */
   --text-main: #1f2937;
   --text-muted: #6b7280;
-  --bg-main: #f9fafb;
-  --bg-card: #ffffff;
   --danger: #ef4444;
   --success: #10b981;
-  --border-radius: 8px;
-  --transition: all 0.3s ease;
+  --border-radius: 20px; /* Softer radius */
+  --input-radius: 12px;
+  --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * {
@@ -24,75 +22,249 @@
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  background-color: var(--bg-main);
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg-gradient);
+  background-attachment: fixed;
   color: var(--text-main);
-  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
 }
 
 a {
   text-decoration: none;
-  color: var(--primary-color);
+  color: var(--primary);
+  transition: var(--transition);
 }
 
-ul {
-  list-style: none;
+a:hover {
+  color: var(--secondary);
 }
 
-/* Utilities */
+.app {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
 .container {
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
 }
 
+/* Glassmorphism Card */
+.card {
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--border-radius);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  padding: 25px 35px;
+  transition: var(--transition);
+  width: 100%;
+  position: relative;
+  z-index: 10;
+}
+
+.card h3 {
+  color: #111827;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem !important;
+  text-align: center;
+  background: linear-gradient(to right, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Buttons */
 .btn {
   display: inline-block;
   padding: 10px 20px;
-  border-radius: var(--border-radius);
+  border-radius: var(--input-radius);
   border: none;
   font-weight: 600;
+  font-size: 1.05rem;
+  font-family: inherit;
   cursor: pointer;
   transition: var(--transition);
   text-align: center;
+  position: relative;
+  overflow: hidden;
 }
 
 .btn-primary {
-  background-color: var(--primary-color);
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
   color: white;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
 }
 
 .btn-primary:hover {
-  background-color: var(--primary-hover);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(139, 92, 246, 0.6);
 }
 
-.card {
-  background: var(--bg-card);
-  border-radius: var(--border-radius);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  padding: 20px;
+.btn-primary:active {
+  transform: translateY(1px);
 }
 
+/* Input Fields */
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 12px;
+  text-align: left;
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   font-weight: 500;
+  font-size: 0.85rem;
+  color: #374151;
+}
+
+.input-with-icon {
+  position: relative;
+  width: 100%;
+}
+
+.input-with-icon .input-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  pointer-events: none;
+  transition: var(--transition);
+  width: 16px;
+  height: 16px;
+}
+
+.input-with-icon input:focus ~ .input-icon,
+.input-with-icon select:focus ~ .input-icon {
+  color: var(--primary);
 }
 
 .form-control {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: var(--border-radius);
+  padding-left: 36px; /* Space for the icon */
+  border: 2px solid transparent;
+  background-color: rgba(249, 250, 251, 0.8);
+  border-radius: var(--input-radius);
   outline: none;
   font-size: 1rem;
+  font-family: inherit;
+  transition: var(--transition);
+  color: #111827;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.form-control::placeholder {
+  color: #9ca3af;
 }
 
 .form-control:focus {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  border-color: rgba(139, 92, 246, 0.5);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15), inset 0 2px 4px rgba(0,0,0,0.01);
+}
+
+/* Auth Layout - Split Screen */
+.auth-container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.auth-left {
+  flex: 1.2;
+  background-image: url('/hero-bg.png');
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 80px;
+  color: white;
+}
+
+.auth-left::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(to top, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.1) 100%);
+}
+
+.auth-hero-content {
+  position: relative;
+  z-index: 2;
+}
+
+.auth-hero-title {
+  font-size: 4.5rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  line-height: 1.05;
+  letter-spacing: -1px;
+}
+
+.auth-hero-subtitle {
+  font-size: 1.3rem;
+  color: #e2e8f0;
+  max-width: 500px;
+  line-height: 1.6;
+}
+
+.auth-right {
+  flex: 1;
+  background: var(--bg-gradient);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80px 20px 20px 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Glowing Background Blobs */
+.auth-bg-blob {
+  position: absolute;
+  filter: blur(90px);
+  z-index: 0;
+  opacity: 0.6;
+  border-radius: 50%;
+  animation: float 10s infinite ease-in-out alternate;
+}
+
+.blob-1 {
+  background: var(--primary);
+  width: 350px; height: 350px;
+  top: -10%; right: -10%;
+}
+
+.blob-2 {
+  background: var(--secondary);
+  width: 300px; height: 300px;
+  bottom: -10%; left: -10%;
+  animation-delay: -5s;
+}
+
+@keyframes float {
+  0% { transform: translateY(0) scale(1) rotate(0deg); }
+  100% { transform: translateY(-40px) scale(1.1) rotate(10deg); }
+}
+
+@media (max-width: 960px) {
+  .auth-left { display: none; }
 }

@@ -9,6 +9,7 @@ import Dashboard from '../pages/Dashboard';
 import Profile from '../pages/Profile';
 import PropertyList from '../pages/PropertyList';
 import Matches from '../pages/Matches';
+import AdminDashboard from '../pages/AdminDashboard';
 
 // Protected Route wrapper component
 const ProtectedRoute = ({ children }) => {
@@ -37,6 +38,11 @@ const AppRoutes = () => {
         } />
         <Route path="/matches" element={
           <ProtectedRoute><Matches /></ProtectedRoute>
+        } />
+        
+        {/* React Admin Panel Route */}
+        <Route path="/admin-dashboard" element={
+          <ProtectedRoute><AdminDashboard /></ProtectedRoute>
         } />
       </Routes>
     </>
