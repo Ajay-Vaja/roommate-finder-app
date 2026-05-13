@@ -1,42 +1,101 @@
 import React from 'react';
+import { motion } from 'framer-motion';
+import { Home } from 'lucide-react';
 
 const Loader = () => {
   return (
-    <div style={styles.loaderContainer}>
-      <div style={styles.spinner}></div>
-      <p>Loading...</p>
+    <div style={styles.overlay}>
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        style={styles.glassCard}
+      >
+        <div style={styles.loaderWrapper}>
+          {/* Spinning Gradient Ring */}
+          <motion.div 
+            animate={{ rotate: 360 }}
+            transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
+            style={styles.ring}
+          />
+          
+          {/* Pulsing Home Icon */}
+          <motion.div 
+            animate={{ 
+              scale: [1, 1.1, 1],
+              opacity: [0.7, 1, 0.7]
+            }}
+            transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+            style={styles.iconContainer}
+          >
+            <Home size={32} color="white" />
+          </motion.div>
+        </div>
+        
+        <motion.p 
+          animate={{ opacity: [0.4, 1, 0.4] }}
+          transition={{ repeat: Infinity, duration: 2 }}
+          style={styles.text}
+        >
+          Finding your stay...
+        </motion.p>
+      </motion.div>
     </div>
   );
 };
 
 const styles = {
-  loaderContainer: {
+  overlay: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: '200px',
+    width: '100%',
+    padding: '40px',
+  },
+  glassCard: {
+    padding: '40px 60px',
+    borderRadius: '30px',
+    background: 'rgba(255, 255, 255, 0.03)',
+    backdropFilter: 'blur(10px)',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'center',
-    padding: '40px'
+    gap: '20px',
+    boxShadow: '0 20px 50px rgba(0,0,0,0.2)',
   },
-  spinner: {
-    width: '40px',
-    height: '40px',
-    border: '4px solid rgba(0,0,0,0.1)',
-    borderTop: '4px solid var(--primary-color)',
+  loaderWrapper: {
+    position: 'relative',
+    width: '80px',
+    height: '80px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ring: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
     borderRadius: '50%',
-    animation: 'spin 1s linear infinite',
-    marginBottom: '10px'
+    border: '3px solid transparent',
+    borderTop: '3px solid #8b5cf6',
+    borderRight: '3px solid #d946ef',
+    boxShadow: '0 0 15px rgba(139, 92, 246, 0.3)',
+  },
+  iconContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 2,
+  },
+  text: {
+    fontSize: '0.9rem',
+    fontWeight: '700',
+    color: 'rgba(255,255,255,0.7)',
+    letterSpacing: '1px',
+    textTransform: 'uppercase',
+    margin: 0,
   }
 };
-
-// Add keyframes dynamically for the spinner
-const styleSheet = document.createElement("style");
-styleSheet.type = "text/css";
-styleSheet.innerText = `
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-`;
-document.head.appendChild(styleSheet);
 
 export default Loader;

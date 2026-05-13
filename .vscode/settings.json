@@ -1,0 +1,10 @@
+{
+    "python.defaultInterpreterPath": "a:/roommate-finder-app/backend/venv/Scripts/python.exe",
+    "python.languageServer": "Pylance",
+    "python.analysis.extraPaths": [
+        "a:/roommate-finder-app/backend",
+        "a:/roommate-finder-app/backend/venv/Lib/site-packages"
+    ],
+    "python.analysis.autoImportCompletions": true,
+    "python.terminal.activateEnvInCurrentTerminal": true
+}

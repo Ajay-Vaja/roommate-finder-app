@@ -1,4 +1,4 @@
-# Roommate Finder Backend
+# FindMyStay Backend
 
 A Flask backend using REST APIs, SQLAlchemy, and JWT Authentication.
 
