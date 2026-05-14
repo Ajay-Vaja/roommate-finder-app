@@ -18,3 +18,7 @@ export const getMyProperties = () => api.get('/user/properties');
 export const toggleSaveProperty = (id) => api.post(`/properties/${id}/save`);
 
 export const getSavedProperties = () => api.get('/user/saved-properties');
+
+export const updateProperty = (id, data) => api.put(`/properties/${id}`, data);
+
+export const deleteProperty = (id) => api.delete(`/properties/${id}`);

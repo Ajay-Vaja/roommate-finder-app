@@ -2,9 +2,14 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Home } from 'lucide-react';
 
-const Loader = () => {
+const Loader = ({ fullScreen = true }) => {
+  const overlayStyle = {
+    ...styles.overlay,
+    ...(fullScreen ? styles.fullScreenOverlay : styles.inlineOverlay)
+  };
+
   return (
-    <div style={styles.overlay}>
+    <div style={overlayStyle}>
       <motion.div 
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -48,9 +53,21 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: '200px',
     width: '100%',
+  },
+  fullScreenOverlay: {
+    height: '100vh',
+    width: '100vw',
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    background: 'var(--bg-gradient)',
+    zIndex: 9999,
+  },
+  inlineOverlay: {
+    minHeight: '200px',
     padding: '40px',
+    background: 'transparent',
   },
   glassCard: {
     padding: '40px 60px',

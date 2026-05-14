@@ -102,6 +102,12 @@ api_bp.route('/properties', methods=['GET'])(property_view)
 # View details of a specific property
 api_bp.route('/properties/<int:property_id>', methods=['GET'])(property_view)
 
+# Update a property
+api_bp.route('/properties/<int:property_id>', methods=['PUT'])(property_view)
+
+# Delete a property
+api_bp.route('/properties/<int:property_id>', methods=['DELETE'])(property_view)
+
 # View properties listed by you
 api_bp.route('/user/properties', methods=['GET'])(PropertyController().get_my_listings)
 

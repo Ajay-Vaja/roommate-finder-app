@@ -77,18 +77,25 @@ const Navbar = () => {
 
               {/* Lister Specific Links */}
               {user.user_type === 'Lister' && (
-                <li>
-                  <Link to="/visit-requests" style={styles.link}>
-                    <Bell size={18} /> Visit Requests 
-                    <span style={styles.dot}></span>
-                  </Link>
-                </li>
+                <>
+                  <li>
+                    <Link to="/manage-properties" style={styles.link}>
+                      <LayoutDashboard size={18} /> Manage Listings
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/visit-requests" style={styles.link}>
+                      <Bell size={18} /> Visit Requests 
+                      <span style={styles.dot}></span>
+                    </Link>
+                  </li>
+                </>
               )}
 
-              {/* Separate Dashboard Link as requested */}
+              {/* Separate Profile Link as requested */}
               <li>
-                <Link to="/dashboard" style={styles.link}>
-                  <LayoutDashboard size={18} /> Dashboard
+                <Link to="/profile" style={styles.link}>
+                  <UserCircle size={18} /> Profile
                 </Link>
               </li>
               
@@ -133,9 +140,14 @@ const Navbar = () => {
                       )}
 
                       {user.user_type === 'Lister' && (
-                        <Link to="/post-property" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-                          <Plus size={16} /> List Property
-                        </Link>
+                        <>
+                          <Link to="/manage-properties" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+                            <LayoutDashboard size={16} /> Manage Listings
+                          </Link>
+                          <Link to="/post-property" style={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+                            <Plus size={16} /> List Property
+                          </Link>
+                        </>
                       )}
 
                       <div style={styles.divider}></div>

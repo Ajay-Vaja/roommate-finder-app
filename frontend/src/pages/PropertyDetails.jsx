@@ -71,7 +71,7 @@ const PropertyDetails = () => {
     return () => { document.body.style.overflow = 'unset'; };
   }, [selectedImage, showPhotosModal]);
 
-  if (loading || !property) return <div style={styles.loadingArea}><Loader /></div>;
+  if (loading || !property) return <div style={styles.loadingArea}><Loader fullScreen={false} /></div>;
 
   return (
     <div style={styles.pageWrapper}>

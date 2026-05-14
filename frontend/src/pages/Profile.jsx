@@ -148,9 +148,9 @@ const Profile = () => {
     }
   };
 
-  if (loading || !profileData) return <div style={styles.loadingContainer}><Loader /></div>;
+  if (loading || !profileData) return <div style={styles.loadingContainer}><Loader fullScreen={false} /></div>;
 
-  const { user, lifestyle, requirements, property } = formData;
+  const { user, lifestyle, requirements, properties = [] } = formData;
 
   const calculateProgress = () => {
     let score = 0;
@@ -183,9 +183,10 @@ const Profile = () => {
       });
     } else {
       const propFields = ['title', 'description', 'address', 'city', 'locality', 'rent_amount', 'room_type'];
+      const firstProp = properties && properties[0];
       propFields.forEach(f => {
         total++;
-        if (property && property[f]) score++;
+        if (firstProp && firstProp[f]) score++;
       });
     }
 
@@ -265,7 +266,9 @@ const Profile = () => {
               <HabitBox icon={<Volume2 size={20} />} label="Noise" value={lifestyle.noise_level} isEditing={isEditing} options={['Quiet', 'Moderate', 'Lively']} onSelect={(v) => handleInputChange('lifestyle', 'noise_level', v)} />
               <HabitBox icon={<Dog size={20} />} label="Pets" value={lifestyle.pets} isEditing={isEditing} options={['Yes', 'No', 'Love them']} onSelect={(v) => handleInputChange('lifestyle', 'pets', v)} />
               <HabitBox icon={<Briefcase size={20} />} label="WFH Status" value={lifestyle.work_from_home} isEditing={isEditing} options={['Yes', 'No', 'Sometimes']} onSelect={(v) => handleInputChange('lifestyle', 'work_from_home', v)} />
-              <HabitBox icon={<Users size={20} />} label={authUser.user_type === 'Seeker' ? 'People Moving In' : 'Roommates Needed'} value={isEditing ? lifestyle.occupancy_count : `${lifestyle.occupancy_count} ${lifestyle.occupancy_count === 1 ? (authUser.user_type === 'Seeker' ? 'Person' : 'Roommate') : (authUser.user_type === 'Seeker' ? 'People' : 'Roommates')}`} isEditing={isEditing} options={[1, 2, 3]} onSelect={(v) => handleInputChange('lifestyle', 'occupancy_count', v)} />
+              {authUser.user_type === 'Seeker' && (
+                <HabitBox icon={<Users size={20} />} label="People Moving In" value={isEditing ? lifestyle.occupancy_count : `${lifestyle.occupancy_count} ${lifestyle.occupancy_count === 1 ? 'Person' : 'People'}`} isEditing={isEditing} options={[1, 2, 3, 4]} onSelect={(v) => handleInputChange('lifestyle', 'occupancy_count', v)} />
+              )}
             </div>
           </section>
 
@@ -311,15 +314,23 @@ const Profile = () => {
                   </div>
                 </div>
               </div>
-            ) : property && (
+            ) : (
               <div style={styles.sideCard}>
-                <h3 style={styles.sideCardTitle}>My Listing</h3>
-                <div style={styles.listMini}>
-                  <Home size={24} color="var(--primary)" />
-                  <div>
-                    <h4>{property.title}</h4>
-                    <p>{property.locality}, {property.city}</p>
-                  </div>
+                <h3 style={styles.sideCardTitle}>My Listings</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                  {properties.length > 0 ? properties.map(prop => (
+                    <div key={prop.id} style={styles.listMini}>
+                      <Home size={24} color="var(--primary)" />
+                      <div>
+                        <h4 style={{ color: 'white', fontWeight: '800', margin: 0, fontSize: '1.05rem' }}>{prop.title}</h4>
+                        <p style={{ color: '#94a3b8', margin: 0, fontSize: '0.85rem', fontWeight: '600' }}>{prop.locality}, {prop.city}</p>
+                      </div>
+                    </div>
+                  )) : (
+                    <div style={{ color: '#64748b', fontSize: '0.9rem', fontStyle: 'italic' }}>
+                      No properties listed yet.
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -390,7 +401,7 @@ const styles = {
   prefGrid: { display: 'flex', flexDirection: 'column', gap: '22px' },
   prefLabelStyle: { fontSize: '0.75rem', color: '#a78bfa', fontWeight: '800', textTransform: 'uppercase', marginBottom: '8px', display: 'block', letterSpacing: '0.5px' },
   prefValueStyle: { fontSize: '1.15rem', fontWeight: '800', color: 'white' },
-  listMini: { display: 'flex', alignItems: 'center', gap: '15px', '& h4': { color: 'white', fontWeight: '800', margin: 0 }, '& p': { color: '#64748b', margin: 0 } },
+  listMini: { display: 'flex', alignItems: 'center', gap: '15px' },
   suggestionBox: { position: 'absolute', top: '100%', left: 0, right: 0, backgroundColor: '#1e293b', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', zIndex: 100 },
   suggestionItem: { padding: '12px 20px', color: 'white', cursor: 'pointer', '&:hover': { backgroundColor: 'rgba(255,255,255,0.05)' } }
 };

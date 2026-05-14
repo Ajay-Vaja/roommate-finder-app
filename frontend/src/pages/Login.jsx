@@ -91,7 +91,7 @@ const Login = () => {
       } else if (!user.is_profile_complete) {
         navigate('/onboarding');
       } else {
-        navigate('/dashboard');
+        navigate('/profile');
       }
     }
   }, [user, navigate]);

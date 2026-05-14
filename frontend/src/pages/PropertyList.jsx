@@ -475,7 +475,7 @@ const PropertyList = () => {
                 </div>
 
               {loading ? (
-                <div style={styles.loaderArea}><Loader /></div>
+                <div style={styles.loaderArea}><Loader fullScreen={false} /></div>
               ) : (
                 <div style={styles.grid}>
                   {filteredProperties.length > 0 ? (

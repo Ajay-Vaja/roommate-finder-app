@@ -159,7 +159,7 @@ def get_profile():
         return jsonify({"msg": "User not found"}), 404
     
     profile = Profile.query.filter_by(user_id=user.id).first()
-    property_obj = Property.query.filter_by(user_id=user.id).first()
+    properties = Property.query.filter_by(user_id=user.id).all()
     
     return jsonify({
         "user": {
@@ -195,17 +195,17 @@ def get_profile():
             "room_type_pref": profile.room_type_pref if profile else "Private",
             "move_in_date": profile.move_in_date.isoformat() if profile and profile.move_in_date else ""
         } if user.user_type == 'Seeker' else None,
-        "property": {
-            "id": property_obj.id,
-            "title": property_obj.title,
-            "description": property_obj.description,
-            "address": property_obj.address,
-            "city": property_obj.city,
-            "locality": property_obj.locality,
-            "rent_amount": property_obj.rent_amount,
-            "room_type": property_obj.room_type,
-            "amenities": property_obj.amenities
-        } if user.user_type == 'Lister' and property_obj else None
+        "properties": [{
+            "id": p.id,
+            "title": p.title,
+            "description": p.description,
+            "address": p.address,
+            "city": p.city,
+            "locality": p.locality,
+            "rent_amount": p.rent_amount,
+            "room_type": p.room_type,
+            "amenities": p.amenities
+        } for p in properties] if user.user_type == 'Lister' else []
     }), 200
 
 @jwt_required()

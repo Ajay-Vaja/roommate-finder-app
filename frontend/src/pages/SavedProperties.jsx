@@ -48,7 +48,7 @@ const SavedProperties = () => {
     }
   };
 
-  if (loading) return <div style={styles.loaderArea}><Loader /></div>;
+  if (loading) return <div style={styles.loaderArea}><Loader fullScreen={false} /></div>;
 
   return (
     <div style={styles.pageWrapper}>

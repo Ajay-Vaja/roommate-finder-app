@@ -1,7 +1,24 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Card from '../components/Card';
+import { getMyProperties } from '../services/propertyService';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+  const [properties, setProperties] = useState([]);
+
+  useEffect(() => {
+    const fetchProps = async () => {
+      try {
+        const res = await getMyProperties();
+        setProperties(res.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchProps();
+  }, []);
+
   return (
     <div className="container" style={{ marginTop: '40px' }}>
       <h2 style={{ marginBottom: '20px' }}>Dashboard</h2>
@@ -10,9 +27,15 @@ const Dashboard = () => {
           <p>Your profile is 80% complete.</p>
           <button className="btn btn-primary" style={{ marginTop: '10px' }}>Complete Profile</button>
         </Card>
-        <Card title="Recent Matches">
-          <p>You have 3 new potential roommates!</p>
-          <button className="btn" style={{ marginTop: '10px', border: '1px solid #ccc' }}>View Matches</button>
+        <Card title="Manage My Properties">
+          <p>You have {properties.length} active listings.</p>
+          <button 
+            className="btn btn-primary" 
+            style={{ marginTop: '10px' }}
+            onClick={() => navigate('/manage-properties')}
+          >
+            Manage Listings
+          </button>
         </Card>
       </div>
     </div>

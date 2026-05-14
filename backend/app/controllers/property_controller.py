@@ -31,7 +31,7 @@ class PropertyController(MethodView):
         """
         Creates a new property listing for the current Lister.
         """
-        current_user_id = get_jwt_identity()
+        current_user_id = int(get_jwt_identity())
         data = request.get_json()
 
         # Validation: Ensure core data is present
@@ -179,12 +179,78 @@ class PropertyController(MethodView):
         return jsonify(result), 200
 
     @jwt_required()
+    def put(self, property_id):
+        """
+        Updates an existing property listing.
+        Only the owner can update.
+        """
+        current_user_id = int(get_jwt_identity())
+        prop = Property.query.get(property_id)
+
+        if not prop:
+            return jsonify({"msg": "Property not found"}), 404
+
+        if prop.user_id != current_user_id:
+            return jsonify({"msg": "You are not authorized to update this property"}), 403
+
+        data = request.get_json()
+
+        try:
+            # Update fields if provided
+            if 'title' in data: prop.title = data['title']
+            if 'description' in data: prop.description = data['description']
+            if 'address' in data: prop.address = data['address']
+            if 'city' in data: prop.city = data['city']
+            if 'locality' in data: prop.locality = data['locality']
+            if 'rent_amount' in data: prop.rent_amount = data['rent_amount']
+            if 'room_type' in data: prop.room_type = data['room_type']
+            if 'amenities' in data: prop.amenities = data['amenities']
+            if 'occupancy_count' in data: prop.occupancy_count = data['occupancy_count']
+            
+            if 'available_from' in data:
+                prop.available_from = datetime.fromisoformat(data['available_from']) if data['available_from'] else None
+            
+            if 'images' in data:
+                prop.images = data['images']
+
+            db.session.commit()
+            return jsonify({"msg": "Property updated successfully"}), 200
+
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"msg": f"An error occurred: {str(e)}"}), 500
+
+    @jwt_required()
+    def delete(self, property_id):
+        """
+        Deletes a property listing.
+        Only the owner can delete.
+        """
+        current_user_id = int(get_jwt_identity())
+        prop = Property.query.get(property_id)
+
+        if not prop:
+            return jsonify({"msg": "Property not found"}), 404
+
+        if prop.user_id != current_user_id:
+            return jsonify({"msg": "You are not authorized to delete this property"}), 403
+
+        try:
+            db.session.delete(prop)
+            db.session.commit()
+            return jsonify({"msg": "Property deleted successfully"}), 200
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"msg": f"An error occurred: {str(e)}"}), 500
+
+    @jwt_required()
     def get_my_listings(self):
         """
         Fetches properties owned by the currently authenticated Lister.
+        Enhanced to include more details for management.
         """
-        current_user_id = get_jwt_identity()
-        properties = Property.query.filter_by(user_id=current_user_id).all()
+        current_user_id = int(get_jwt_identity())
+        properties = Property.query.filter_by(user_id=current_user_id).order_by(Property.created_at.desc()).all()
         
         result = []
         for prop in properties:
@@ -194,6 +260,9 @@ class PropertyController(MethodView):
                 "rent_amount": prop.rent_amount,
                 "city": prop.city,
                 "locality": prop.locality,
+                "images": split_property_images(prop.images),
+                "room_type": prop.room_type,
+                "views": prop.views or 0,
                 "created_at": prop.created_at.isoformat()
             })
 

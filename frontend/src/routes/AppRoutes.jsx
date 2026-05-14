@@ -15,6 +15,8 @@ import PostProperty from '../pages/PostProperty';
 import PropertyDetails from '../pages/PropertyDetails';
 import PublicProfile from '../pages/PublicProfile';
 import SavedProperties from '../pages/SavedProperties';
+import ManageProperties from '../pages/ManageProperties';
+import EditProperty from '../pages/EditProperty';
 
 // Protected Route wrapper component
 const ProtectedRoute = ({ children }) => {
@@ -38,12 +40,19 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
+const RootRedirect = () => {
+  const { user } = useAuth();
+  if (!user) return <Navigate to="/properties" replace />;
+  if (user.role === 'Admin') return <Navigate to="/admin-dashboard" replace />;
+  return <Navigate to="/profile" replace />;
+};
+
 const AppRoutes = () => {
   return (
     <>
       <Navbar />
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<RootRedirect />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/properties" element={<PropertyList />} />
@@ -70,6 +79,14 @@ const AppRoutes = () => {
 
         <Route path="/saved-properties" element={
           <ProtectedRoute><SavedProperties /></ProtectedRoute>
+        } />
+
+        <Route path="/manage-properties" element={
+          <ProtectedRoute><ManageProperties /></ProtectedRoute>
+        } />
+
+        <Route path="/edit-property/:id" element={
+          <ProtectedRoute><EditProperty /></ProtectedRoute>
         } />
         
         {/* React Admin Panel Route */}

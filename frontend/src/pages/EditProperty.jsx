@@ -1,14 +1,15 @@
-import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Building, MapPin, DollarSign, Tag, Calendar, 
   Image as ImageIcon, Plus, X, AlignLeft, Info, 
-  Upload, CheckCircle2, Trash2, Camera
+  Upload, CheckCircle2, Trash2, Camera, ArrowLeft
 } from 'lucide-react';
-import { createProperty } from '../services/propertyService';
+import { getProperty, updateProperty } from '../services/propertyService';
 import { locationData } from '../utils/locationData';
 import toast from 'react-hot-toast';
+import Loader from '../components/Loader';
 
 const PREDEFINED_AMENITIES = [
   "WiFi", "Air Conditioning", "Geyser", "RO Water",
@@ -20,20 +21,16 @@ const PREDEFINED_AMENITIES = [
 ];
 
 const TITLE_SUGGESTIONS = [
-  "1 RK",
-  "1 BHK",
-  "2 BHK",
-  "3 BHK",
-  "4 BHK",
-  "Tenement",
-  "Bungalow",
-  "Row House"
+  "1 RK", "1 BHK", "2 BHK", "3 BHK", "4 BHK",
+  "Tenement", "Bungalow", "Row House"
 ];
 
-const PostProperty = () => {
+const EditProperty = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [imagePreviews, setImagePreviews] = useState([]);
   
   const [formData, setFormData] = useState({
@@ -47,8 +44,40 @@ const PostProperty = () => {
     amenities: [],
     available_from: '',
     occupancy_count: 1,
-    images: [] // Array of base64 strings
+    images: [] 
   });
+
+  useEffect(() => {
+    const fetchProperty = async () => {
+      try {
+        const response = await getProperty(id);
+        const data = response.data;
+        
+        // Handle comma-separated locality and amenities if needed
+        setFormData({
+          title: data.title || '',
+          description: data.description || '',
+          address: data.address || '',
+          city: data.city || '',
+          locality: data.locality || '',
+          rent_amount: data.rent_amount || '',
+          room_type: data.room_type || 'Private',
+          amenities: Array.isArray(data.amenities) ? data.amenities : (data.amenities ? data.amenities.split(',') : []),
+          available_from: data.available_from ? data.available_from.split('T')[0] : '',
+          occupancy_count: data.occupancy_count || 1,
+          images: data.images || []
+        });
+        setImagePreviews(data.images || []);
+      } catch (error) {
+        toast.error('Failed to load property details');
+        navigate('/manage-properties');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProperty();
+  }, [id, navigate]);
 
   const cities = Object.keys(locationData);
   const localities = formData.city ? locationData[formData.city] : [];
@@ -108,26 +137,27 @@ const PostProperty = () => {
       return;
     }
     
-    setLoading(true);
+    setSaving(true);
 
     try {
       const payload = {
         ...formData,
-        amenities: formData.amenities.join(','),
-        locality: Array.isArray(formData.locality) ? formData.locality.join(',') : formData.locality,
-        images: formData.images.join('|SPLIT|'), // Using unique separator for base64
+        amenities: Array.isArray(formData.amenities) ? formData.amenities.join(',') : formData.amenities,
+        images: formData.images.join('|SPLIT|'), 
         rent_amount: parseInt(formData.rent_amount)
       };
 
-      await createProperty(payload);
-      toast.success('Property listed successfully!');
-      navigate('/properties');
+      await updateProperty(id, payload);
+      toast.success('Property updated successfully!');
+      navigate('/manage-properties');
     } catch (error) {
-      toast.error(error.response?.data?.msg || 'Failed to list property');
+      toast.error(error.response?.data?.msg || 'Failed to update property');
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
+
+  if (loading) return <Loader />;
 
   return (
     <div style={styles.container}>
@@ -137,11 +167,16 @@ const PostProperty = () => {
         style={styles.formWrapper}
       >
         <div style={styles.sidebar}>
+          <button onClick={() => navigate('/manage-properties')} style={styles.backBtn}>
+            <ArrowLeft size={18} />
+            <span>Back to Manage</span>
+          </button>
+          
           <div style={styles.sidebarHeader}>
             <div style={styles.logoCircle}>
               <Building size={24} color="white" />
             </div>
-            <h2 style={styles.sidebarTitle}>Property Hub</h2>
+            <h2 style={styles.sidebarTitle}>Update Listing</h2>
           </div>
           
           <div style={styles.steps}>
@@ -153,14 +188,14 @@ const PostProperty = () => {
           </div>
 
           <div style={styles.sidebarFooter}>
-            <p style={styles.footerText}>Need help listing? <a href="#" style={{ color: 'white' }}>Contact Support</a></p>
+            <p style={styles.footerText}>Need help? <a href="#" style={{ color: 'white' }}>Contact Support</a></p>
           </div>
         </div>
 
         <div style={styles.content}>
           <div style={styles.header}>
-            <h1 style={styles.title}>List Your Property</h1>
-            <p style={styles.subtitle}>Fill in the details to find your perfect roommate</p>
+            <h1 style={styles.title}>Edit Property</h1>
+            <p style={styles.subtitle}>Update your property details to keep it attractive</p>
           </div>
 
           <form onSubmit={handleSubmit} style={styles.form}>
@@ -357,7 +392,7 @@ const PostProperty = () => {
                 onClick={() => fileInputRef.current?.click()}
               >
                 <Upload size={32} color="#9ca3af" />
-                <p style={styles.dropzoneText}>Click to upload property photos (Max 10)</p>
+                <p style={styles.dropzoneText}>Click to add more photos (Max 10)</p>
                 <span style={{ fontSize: '0.8rem', color: '#9ca3af' }}>Only images (JPG, PNG) are allowed</span>
                 <input 
                   type="file" 
@@ -397,9 +432,9 @@ const PostProperty = () => {
               type="submit" 
               className="btn btn-primary" 
               style={styles.submitBtn}
-              disabled={loading}
+              disabled={saving}
             >
-              {loading ? 'Processing...' : 'Publish Listing'}
+              {saving ? 'Updating...' : 'Update Listing'}
             </button>
           </form>
         </div>
@@ -443,6 +478,21 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     color: 'white',
+  },
+  backBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    color: 'white',
+    border: 'none',
+    padding: '8px 12px',
+    borderRadius: '10px',
+    cursor: 'pointer',
+    fontSize: '0.85rem',
+    marginBottom: '40px',
+    width: 'fit-content',
+    transition: 'all 0.2s ease',
   },
   sidebarHeader: {
     display: 'flex',
@@ -664,4 +714,4 @@ const styles = {
   }
 };
 
-export default PostProperty;
+export default EditProperty;

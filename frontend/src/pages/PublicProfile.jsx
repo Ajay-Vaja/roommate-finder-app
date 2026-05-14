@@ -41,7 +41,7 @@ const PublicProfile = () => {
     fetchProfile();
   }, [id, navigate]);
 
-  if (loading) return <div style={styles.loadingArea}><Loader /></div>;
+  if (loading) return <div style={styles.loadingArea}><Loader fullScreen={false} /></div>;
   if (!profileData) return null;
 
   const { user, lifestyle, property, preferences } = profileData;

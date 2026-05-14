@@ -937,7 +937,7 @@ const AdminDashboard = () => {
                     {isLoading ? (
                       <tr>
                         <td colSpan="13" style={{ textAlign: 'center', padding: '40px', color: theme.textMuted }}>
-                          <Loader />
+                          <Loader fullScreen={false} />
                         </td>
                       </tr>
                     ) : users.length === 0 ? (
